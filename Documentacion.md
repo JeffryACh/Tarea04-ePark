@@ -116,3 +116,196 @@ Para cambiar tarifa o reglas, solo se toca la clase ScooterElectrico o politicas
 2. Minimo acoplamiento entre capas.
 3. Sin if gigante por tipo de vehiculo.
 4. Casos de uso con flujo claro y trazable.
+
+## 10. Ejecucion multiplataforma (detalle tecnico)
+
+### 10.1 Flujo tecnico estandar de este proyecto
+
+Este repositorio se ejecuta con compilacion manual de Java y salida al directorio `out`.
+
+Flujo:
+
+1. Instalar JDK 17+.
+2. Verificar herramientas `java` y `javac`.
+3. Compilar todas las clases fuente de `src/main/java`.
+4. Ejecutar la clase principal `com.epark.app.Main`.
+
+### 10.2 Linux Ubuntu o Debian (nativo y WSL)
+
+#### Instalacion de JDK (Ubuntu/Debian)
+
+```bash
+sudo apt update
+sudo apt install -y openjdk-17-jdk
+```
+
+#### Verificacion (Ubuntu/Debian)
+
+```bash
+java -version
+javac -version
+```
+
+#### Ubicacion del proyecto
+
+- Linux nativo:
+
+```bash
+cd /ruta/a/Tarea04-ePark
+```
+
+- WSL con proyecto en disco Windows:
+
+```bash
+cd /mnt/c/TareasReque/Tarea04/Tarea04-ePark
+```
+
+#### Compilacion y ejecucion (Ubuntu/Debian)
+
+```bash
+mkdir -p out
+find src/main/java -name "*.java" > sources.txt
+javac -d out @sources.txt
+java -cp out com.epark.app.Main
+```
+
+### 10.3 Linux Arch (nativo y WSL)
+
+#### Instalacion de JDK (Arch)
+
+```bash
+sudo pacman -Syu
+sudo pacman -S --needed jdk17-openjdk
+```
+
+#### Verificacion (Arch)
+
+```bash
+java -version
+javac -version
+```
+
+#### Compilacion y ejecucion (Arch)
+
+```bash
+mkdir -p out
+find src/main/java -name "*.java" > sources.txt
+javac -d out @sources.txt
+java -cp out com.epark.app.Main
+```
+
+### 10.4 Windows 11 (PowerShell)
+
+#### Instalacion de JDK (Windows 11)
+
+```powershell
+winget install -e --id Microsoft.OpenJDK.17
+```
+
+Alternativa:
+
+```powershell
+winget install -e --id EclipseAdoptium.Temurin.17.JDK
+```
+
+#### Verificacion (Windows 11)
+
+```powershell
+java -version
+javac -version
+```
+
+#### Compilacion y ejecucion (Windows 11)
+
+```powershell
+cd C:\TareasReque\Tarea04\Tarea04-ePark
+New-Item -ItemType Directory -Force out | Out-Null
+$fuentes = Get-ChildItem -Recurse -Path src/main/java -Filter *.java | ForEach-Object { $_.FullName }
+javac -d out $fuentes
+java -cp out com.epark.app.Main
+```
+
+### 10.5 macOS (Intel y Apple Silicon)
+
+#### Instalacion de JDK (macOS)
+
+Si no tienes Homebrew:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Instalar Java:
+
+```bash
+brew update
+brew install openjdk@17
+echo 'export PATH="$(brew --prefix openjdk@17)/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+#### Verificacion (macOS)
+
+```bash
+java -version
+javac -version
+```
+
+#### Compilacion y ejecucion (macOS)
+
+```bash
+cd /ruta/a/Tarea04-ePark
+mkdir -p out
+find src/main/java -name "*.java" > sources.txt
+javac -d out @sources.txt
+java -cp out com.epark.app.Main
+```
+
+### 10.6 WSL en Windows 11 (infraestructura Linux sobre Windows)
+
+Paso 1. Abrir PowerShell como administrador:
+
+```powershell
+wsl --install
+```
+
+Paso 2. Reiniciar equipo.
+
+Paso 3. Listar distribuciones:
+
+```powershell
+wsl --list --online
+```
+
+Paso 4. Instalar distro, por ejemplo:
+
+```powershell
+wsl --install -d Ubuntu
+```
+
+o
+
+```powershell
+wsl --install -d Debian
+```
+
+Para Arch usar el nombre exacto que retorne `wsl --list --online`.
+
+Paso 5. Abrir la distro, crear usuario Linux y aplicar los pasos de instalacion y compilacion de las secciones 10.2 o 10.3.
+
+### 10.7 Diagnostico rapido de errores comunes
+
+1. Error `java: command not found`:
+Java no esta instalado o no esta en PATH. Reinstalar JDK y abrir terminal nueva.
+
+2. Error `javac: command not found`:
+Tienes JRE pero no JDK. Instalar JDK completo.
+
+3. Error `ClassNotFoundException: com.epark.app.Main`:
+No se compilo correctamente al directorio `out` o se ejecuto desde carpeta incorrecta.
+
+4. Error de permisos en Linux/macOS:
+Verificar permisos de escritura sobre la carpeta del proyecto y sobre `out`.
+
+5. WSL lento con archivos en `/mnt/c`:
+Recomendacion tecnica para rendimiento: trabajar dentro del home Linux (por ejemplo `~/workspace`).
