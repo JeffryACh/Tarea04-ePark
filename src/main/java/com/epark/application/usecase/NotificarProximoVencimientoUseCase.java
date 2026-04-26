@@ -1,30 +1,20 @@
 package com.epark.application.usecase;
 
-import com.epark.domain.enums.CanalNotificacion;
 import com.epark.domain.model.Estadia;
-import com.epark.domain.model.Notificacion;
-import com.epark.domain.ports.RelojSistema;
-import com.epark.domain.ports.RepositorioEstadias;
-import com.epark.domain.ports.ServicioNotificacion;
+import com.epark.domain.ports.Repositorio;
+import com.epark.domain.ports.Servicios;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class NotificarProximoVencimientoUseCase {
-    private final RepositorioEstadias repositorioEstadias;
-    private final ServicioNotificacion servicioNotificacion;
-    private final RelojSistema relojSistema;
+    private final Repositorio repositorio;
+    private final Servicios servicios;
 
-    public NotificarProximoVencimientoUseCase(
-            RepositorioEstadias repositorioEstadias,
-            ServicioNotificacion servicioNotificacion,
-            RelojSistema relojSistema
-    ) {
-        this.repositorioEstadias = Objects.requireNonNull(repositorioEstadias, "repositorioEstadias es obligatorio");
-        this.servicioNotificacion = Objects.requireNonNull(servicioNotificacion, "servicioNotificacion es obligatorio");
-        this.relojSistema = Objects.requireNonNull(relojSistema, "relojSistema es obligatorio");
+    public NotificarProximoVencimientoUseCase(Repositorio repositorio, Servicios servicios) {
+        this.repositorio = Objects.requireNonNull(repositorio, "Repositorio es obligatorio");
+        this.servicios = Objects.requireNonNull(servicios, "Servicios es obligatorio");
     }
 
     public int ejecutar(long minutosAnticipacion) {
@@ -32,20 +22,17 @@ public class NotificarProximoVencimientoUseCase {
             throw new IllegalArgumentException("minutosAnticipacion debe ser mayor que cero");
         }
 
-        LocalDateTime ahora = relojSistema.ahora();
-        List<Estadia> proximas = repositorioEstadias.buscarProximasAVencer(ahora, minutosAnticipacion);
+        LocalDateTime ahora = LocalDateTime.now();
+        List<Estadia> proximas = repositorio.buscarEstadiasProximasAVencer(ahora, minutosAnticipacion);
         int totalEnviadas = 0;
 
         for (Estadia estadia : proximas) {
-            String mensaje = "Tu parqueo vence en " + minutosAnticipacion + " minutos. Estadia: " + estadia.getIdEstadia();
-            Notificacion notificacion = new Notificacion(
-                    UUID.randomUUID().toString(),
-                    estadia.getUsuario().getIdUsuario(),
-                    CanalNotificacion.APP_PUSH,
-                    mensaje,
-                    ahora
-            );
-            servicioNotificacion.enviar(notificacion);
+            long minutosRestantes = java.time.Duration.between(ahora, estadia.getHoraFin()).toMinutes();
+            if (minutosRestantes < 1) {
+                minutosRestantes = 1;
+            }
+            String mensaje = "Tu parqueo vence en " + minutosRestantes + " minutos. Estadia: " + estadia.getIdEstadia();
+            servicios.enviarNotificacion(estadia.getUsuario().getIdUsuario(), mensaje);
             totalEnviadas++;
         }
 

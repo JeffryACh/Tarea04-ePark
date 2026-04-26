@@ -1,10 +1,7 @@
 package com.epark.domain.model;
 
-import com.epark.domain.enums.EstadoPago;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 public class Pago {
     private final String idPago;
@@ -12,38 +9,15 @@ public class Pago {
     private final String idUsuario;
     private final String idTarjeta;
     private final BigDecimal monto;
-    private final LocalDateTime fechaHora;
-    private EstadoPago estado;
-    private String referenciaExterna;
-    private String motivoRechazo;
+    private final LocalDateTime fecha;
 
-    public Pago(
-            String idPago,
-            String idEstadia,
-            String idUsuario,
-            String idTarjeta,
-            BigDecimal monto,
-            LocalDateTime fechaHora
-    ) {
-        this.idPago = Objects.requireNonNull(idPago, "idPago es obligatorio");
-        this.idEstadia = Objects.requireNonNull(idEstadia, "idEstadia es obligatorio");
-        this.idUsuario = Objects.requireNonNull(idUsuario, "idUsuario es obligatorio");
-        this.idTarjeta = Objects.requireNonNull(idTarjeta, "idTarjeta es obligatorio");
-        this.monto = Objects.requireNonNull(monto, "monto es obligatorio");
-        this.fechaHora = Objects.requireNonNull(fechaHora, "fechaHora es obligatoria");
-        this.estado = EstadoPago.PENDIENTE;
-    }
-
-    public void aprobar(String referenciaExterna) {
-        this.estado = EstadoPago.APROBADO;
-        this.referenciaExterna = referenciaExterna;
-        this.motivoRechazo = null;
-    }
-
-    public void rechazar(String referenciaExterna, String motivoRechazo) {
-        this.estado = EstadoPago.RECHAZADO;
-        this.referenciaExterna = referenciaExterna;
-        this.motivoRechazo = motivoRechazo;
+    public Pago(String idPago, String idEstadia, String idUsuario, String idTarjeta, BigDecimal monto, LocalDateTime fecha) {
+        this.idPago = idPago;
+        this.idEstadia = idEstadia;
+        this.idUsuario = idUsuario;
+        this.idTarjeta = idTarjeta;
+        this.monto = monto;
+        this.fecha = fecha;
     }
 
     public String getIdPago() {
@@ -66,19 +40,12 @@ public class Pago {
         return monto;
     }
 
-    public LocalDateTime getFechaHora() {
-        return fechaHora;
+    public LocalDateTime getFecha() {
+        return fecha;
     }
 
-    public EstadoPago getEstado() {
-        return estado;
-    }
-
-    public String getReferenciaExterna() {
-        return referenciaExterna;
-    }
-
-    public String getMotivoRechazo() {
-        return motivoRechazo;
+    @Override
+    public String toString() {
+        return "Pago{idPago='" + idPago + "', idEstadia='" + idEstadia + "', monto=" + monto + ", fecha=" + fecha + "}";
     }
 }
